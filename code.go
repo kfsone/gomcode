@@ -14,12 +14,52 @@ type Param struct {
 	Value string
 }
 
-func NewParamArray(params ...string) (parameters []Param) {
+func getRune(param interface{}) rune {
+	switch typedval := param.(type) {
+	case rune:
+		{
+			return unicode.ToUpper(typedval)
+		}
+	case byte:
+		{
+			return unicode.ToUpper(rune(typedval))
+		}
+	case []byte:
+		{
+			return unicode.ToUpper(rune(typedval[0]))
+		}
+	case string:
+		{
+			return unicode.ToUpper(rune(typedval[0]))
+		}
+	default:
+		{
+			panic("Parameter key must be a character")
+		}
+	}
+}
+
+func NewParamArray(params ...interface{}) (parameters []Param) {
 	parameters = make([]Param, 0, len(params)/2)
-	for i := 0; i < len(params); i += 2 {
-		key := unicode.ToUpper(rune(params[i][0]))
-		value := params[i+1]
-		parameters = append(parameters, Param{key, value})
+	if len(params)&1 != 0 {
+		panic("NewParamArray requires even number of arguments")
+	}
+	for i := 0; i < len(params); i++ {
+		key := unicode.ToUpper(getRune(params[i]))
+		i++
+		switch value := params[i].(type) {
+		case bool:
+			{
+				if value {
+					parameters = append(parameters, Param{key, ""})
+				}
+				continue
+			}
+		default:
+			{
+				parameters = append(parameters, Param{key, fmt.Sprint(value)})
+			}
+		}
 	}
 	return parameters
 }
@@ -85,7 +125,7 @@ func (c *Code) Emit(lineNo uint) string {
 	//  Mxxx    code
 	//  kxxx    parameter
 	atoms := make([]string, 0, 1+1+len(c.Parameters))
-	if lineNo > 0 {
+	if lineNo > 0 && c.GCode != "M110" {
 		atoms = append(atoms, fmt.Sprintf("N%d", lineNo))
 	}
 	atoms = append(atoms, c.GCode)

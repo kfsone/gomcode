@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewParamArray(t *testing.T) {
-	actual := NewParamArray("t", "1", "xyz", "222", "abc", "A")
+	actual := NewParamArray("t", "1", "xyz", 222, "abc", "A")
 	expected := []Param{Param{'T', "1"}, Param{'X', "222"}, Param{'A', "A"}}
 	assert.Equal(t, expected, actual)
 }

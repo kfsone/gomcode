@@ -23,14 +23,16 @@ func (r *Run) Reset() {
 	r.LineNo = 0
 }
 
-func (r *Run) Queue(c Code) {
-	*r.cmdQueue = append(*r.cmdQueue, c)
+func (r *Run) Queue(codes ...Code) {
+	for _, code := range codes {
+		*r.cmdQueue = append(*r.cmdQueue, code)
+	}
 }
 
 func (r *Run) executeCode(cmds ...Code) error {
 	lineNo := uint(0)
-	if r.Checksum && r.LineNo > 0 {
-		lineNo = r.LineNo
+	if r.Checksum {
+		lineNo = r.LineNo + 1
 	}
 	for _, code := range cmds {
 		if r.Comments == false && code.Comment != "" {
@@ -39,7 +41,7 @@ func (r *Run) executeCode(cmds ...Code) error {
 		if !r.Checksum || code.GCode == "M110" {
 			code.HideChecksum = true
 		}
-		if _, err := r.writer.Write([]byte(code.Emit(lineNo))); err != nil {
+		if _, err := r.writer.Write([]byte(code.Emit(lineNo) + "\n")); err != nil {
 			return err
 		}
 		if lineNo > 0 {
@@ -48,6 +50,8 @@ func (r *Run) executeCode(cmds ...Code) error {
 			} else {
 				code.LineNo = 0
 			}
+			r.LineNo = code.LineNo
+			lineNo += 1
 		}
 		*r.cmdHistory = append(*r.cmdHistory, code)
 	}
