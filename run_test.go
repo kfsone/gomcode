@@ -266,3 +266,19 @@ func TestExecute(t *testing.T) {
 		assert.Equal(t, lines[idx], line)
 	}
 }
+
+func TestRunReset(t *testing.T) {
+	r, writer := tearUp(t)
+	r.Comments = true
+	r.Checksum = true
+	r.Queue(Code{GCode: "X1"})
+	assert.Nil(t, r.ExecuteImmediate(Code{GCode: "T1", Comment: "-t1"}))
+	r.Queue(Code{GCode: "X2"})
+	assert.Nil(t, r.Execute())
+	r.Reset()
+
+	assert.Equal(t, "N1 T1*58 ;-t1\nN2 X1*53\nN3 X2*55\n", writer.String())
+	assert.Equal(t, 0, len(*r.cmdQueue))
+	assert.Equal(t, 0, len(*r.cmdHistory))
+	assert.Equal(t, uint(0), r.LineNo)
+}
