@@ -1,4 +1,4 @@
-package gomcode
+package main
 
 import "io"
 
@@ -24,9 +24,7 @@ func (r *Run) Reset() {
 }
 
 func (r *Run) Queue(codes ...Code) {
-	for _, code := range codes {
-		*r.cmdQueue = append(*r.cmdQueue, code)
-	}
+	*r.cmdQueue = append(*r.cmdQueue, codes...)
 }
 
 func (r *Run) executeCode(cmds ...Code) error {
@@ -35,7 +33,7 @@ func (r *Run) executeCode(cmds ...Code) error {
 		lineNo = r.LineNo + 1
 	}
 	for _, code := range cmds {
-		if r.Comments == false && code.Comment != "" {
+		if !r.Comments && code.Comment != "" {
 			code.Comment = ""
 		}
 		if !r.Checksum || code.GCode == "M110" {

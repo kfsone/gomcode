@@ -1,4 +1,4 @@
-package gomcode
+package main
 
 import (
 	"testing"
@@ -76,7 +76,7 @@ func TestGCodeOverride(t *testing.T) {
 	assert.False(t, ok)
 	assert.Equal(t, 0, len(code.Parameters))
 
-	code.Override('T', "99")
+	assert.Nil(t, code.Override('T', "99"))
 	assert.Equal(t, 1, len(code.Parameters))
 	value, ok := code.Parameter('T')
 	assert.True(t, ok)

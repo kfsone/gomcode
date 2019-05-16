@@ -1,7 +1,6 @@
-package gomcode
+package main
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -78,7 +77,9 @@ func NewCode(gcode string, comment string, params ...Param) Code {
 		if !unicode.IsLetter(param.Key) {
 			panic("Invalid parameter: " + string(param.Key))
 		}
-		code.Override(param.Key, param.Value)
+		if err := code.Override(param.Key, param.Value); err != nil {
+			panic(err)
+		}
 	}
 	return code
 }
@@ -107,7 +108,7 @@ func (c Code) Parameter(key rune) (value string, ok bool) {
 func (c *Code) Override(key rune, value string) error {
 	key = unicode.ToUpper(key)
 	if !unicode.IsLetter(key) {
-		return errors.New(fmt.Sprintf("Invalid key: %c", key))
+		return fmt.Errorf("Invalid key: %c", key)
 	}
 	for _, param := range c.Parameters {
 		if param.Key == key {

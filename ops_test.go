@@ -1,4 +1,4 @@
-package gomcode
+package main
 
 import (
 	"testing"

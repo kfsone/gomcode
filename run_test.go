@@ -1,4 +1,4 @@
-package gomcode
+package main
 
 import (
 	"strings"
@@ -226,7 +226,7 @@ func TestExecute(t *testing.T) {
 
 	assert.Equal(t, 0, writer.Len())
 
-	r.ExecuteImmediate(NewCode("M110", ""))
+	assert.Nil(t, r.ExecuteImmediate(NewCode("M110", "")))
 	assert.Equal(t, 1, len(*r.cmdHistory))
 	assert.Equal(t, 5, len(*r.cmdQueue))
 	assert.Equal(t, "M110", (*r.cmdHistory)[0].GCode)
@@ -236,7 +236,7 @@ func TestExecute(t *testing.T) {
 	assert.Equal(t, "M110\n", writer.String())
 	writer.Reset()
 
-	r.Execute()
+	assert.Nil(t, r.Execute())
 	assert.Equal(t, 0, len(*r.cmdQueue))
 	assert.Equal(t, 6, len(*r.cmdHistory))
 	assert.Equal(t, "M110", (*r.cmdHistory)[0].GCode)
